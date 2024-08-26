@@ -70,6 +70,7 @@ struct Planner {
   const uint N;       // number of agents
   const uint V_size;  // number o vertices
   DistTable D;
+  FlexTable FLEX;
   uint loop_cnt;      // auxiliary
 
   // used in PIBT

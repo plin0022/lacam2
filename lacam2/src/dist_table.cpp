@@ -12,12 +12,29 @@ DistTable::DistTable(const Instance* ins)
   setup(ins);
 }
 
+FlexTable::FlexTable(const Instance* ins)
+    : V_size(ins->G.V.size()),
+      table(ins->N,
+            std::vector<uint>(V_size,
+                              std::numeric_limits<unsigned int>::max()))
+{
+  setup(ins);
+}
+
 void DistTable::setup(const Instance* ins)
 {
   for (size_t i = 0; i < ins->N; ++i) {
     OPEN.push_back(std::queue<Vertex*>());
     auto n = ins->goals[i];
     OPEN[i].push(n);
+    table[i][n->id] = 0;
+  }
+}
+
+void FlexTable::setup(const Instance* ins)
+{
+  for (size_t i = 0; i < ins->N; ++i) {
+    auto n = ins->goals[i];
     table[i][n->id] = 0;
   }
 }
@@ -51,3 +68,4 @@ uint DistTable::get(uint i, uint v_id)
 }
 
 uint DistTable::get(uint i, Vertex* v) { return get(i, v->id); }
+

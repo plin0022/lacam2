@@ -21,3 +21,15 @@ struct DistTable {
 
   void setup(const Instance* ins);  // initialization
 };
+
+
+struct FlexTable{
+  const uint V_size;  // number of vertices
+  std::vector<std::vector<uint>> table;  // index: agent-id & vertex-id
+
+  uint get(uint i, Vertex* v);             // agent, vertex
+
+  FlexTable(const Instance* ins);
+
+  void setup(const Instance* ins);  // initialization
+};
