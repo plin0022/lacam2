@@ -70,11 +70,22 @@ int main(int argc, char* argv[])
 
   // scenarios
   std::string scen_name;
-  std::string base_path = "assets/scen-random_random-32-32-20/random-32-32-20-random-";
+//  std::string base_path = "assets/scen-random_random-32-32-20/random-32-32-20-random-";
+//  std::string base_path = "assets/scen-random_warehouse-10-20-10-2-1/warehouse-10-20-10-2-1-random-";
+//  std::string base_path = "assets/scen-random_random-64-64-20/random-64-64-20-random-";
+//  std::string base_path = "assets/scen-random_maze-128-128-1/maze-128-128-1-random-";
+  std::string base_path = "assets/scen-random_den312d/den312d-random-";
+
 
 
   // map
-  std::string map_name = "assets/random-32-32-20.map";
+//  std::string map_name = "assets/random-32-32-20.map";
+//  std::string map_name = "assets/warehouse-10-20-10-2-1.map";
+//  std::string map_name = "assets/random-64-64-20.map";
+//  std::string map_name = "assets/maze-128-128-1.map";
+  std::string map_name = "assets/empty-48-48.map";
+
+
 
 
   using VarType = std::variant<int, float>;
@@ -95,7 +106,8 @@ int main(int argc, char* argv[])
   volatile float sum_success = 0;
 
 
-  int max_num_agents = 400;
+  int max_num_agents = 1000;
+  int max_scen_num = 25;
 
   for (int num_of_agents = 10; num_of_agents <= max_num_agents; num_of_agents = num_of_agents + 10)
   {
@@ -106,7 +118,7 @@ int main(int argc, char* argv[])
     sum_success = 0;
 
 
-    for (int scen_num = 1; scen_num <= 25; ++scen_num)
+    for (int scen_num = 1; scen_num <= max_scen_num; ++scen_num)
     {
       scen_name = base_path + std::to_string(scen_num) + ".scen";
 
@@ -157,7 +169,7 @@ int main(int argc, char* argv[])
 
     std::vector<VarType> temp_list;
     temp_list.push_back(num_of_agents);
-    temp_list.push_back(sum_success / 25);
+    temp_list.push_back(sum_success / max_scen_num);
     temp_list.push_back(sum_time / sum_success);
     temp_list.push_back(sum_soc_over_lb / sum_success);
     temp_list.push_back(sum_makespan_over_lb / sum_success);

@@ -107,8 +107,8 @@ Solution Planner::solve(std::string& additional_info)
   HNode* H_goal = nullptr;          // to store goal node
 
   // DFS
-//  while (!OPEN.empty() && !is_expired(deadline)) {
-  while (!OPEN.empty()) {
+  while (!OPEN.empty() && !is_expired(deadline)) {
+//  while (!OPEN.empty()) {
     loop_cnt += 1;
 
     // do not pop here!
