@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
   // scenarios
   std::string scen_name;
-  std::string base_path = "assets/scen-random-32-32-20/random-32-32-20-random-";
+  std::string base_path = "assets/scen-random_random-32-32-20/random-32-32-20-random-";
 
 
   // map
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
   volatile float sum_success = 0;
 
 
-  int max_num_agents = 200;
+  int max_num_agents = 400;
 
   for (int num_of_agents = 10; num_of_agents <= max_num_agents; num_of_agents = num_of_agents + 10)
   {
