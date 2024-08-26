@@ -74,8 +74,8 @@ int main(int argc, char* argv[])
 //  std::string base_path = "assets/scen-random_warehouse-10-20-10-2-1/warehouse-10-20-10-2-1-random-";
 //  std::string base_path = "assets/scen-random_random-64-64-20/random-64-64-20-random-";
 //  std::string base_path = "assets/scen-random_maze-128-128-1/maze-128-128-1-random-";
-  std::string base_path = "assets/scen-random_den312d/den312d-random-";
-
+//  std::string base_path = "assets/scen-random_den312d/den312d-random-";
+  std::string base_path = "assets/scen-random_empty-48-48/empty-48-48-random-";
 
 
   // map
@@ -83,6 +83,7 @@ int main(int argc, char* argv[])
 //  std::string map_name = "assets/warehouse-10-20-10-2-1.map";
 //  std::string map_name = "assets/random-64-64-20.map";
 //  std::string map_name = "assets/maze-128-128-1.map";
+//  std::string map_name = "assets/den312d.map";
   std::string map_name = "assets/empty-48-48.map";
 
 
