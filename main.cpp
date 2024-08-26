@@ -128,10 +128,10 @@ int main(int argc, char* argv[])
         info(1, verbose, "failed to solve");
       }
 
-      //      // check feasibility
-      //      if (!is_feasible_solution(ins, solution, verbose)) {
-      //        info(0, verbose, "invalid solution");
-      //      }
+//      // check feasibility
+//      if (!is_feasible_solution(ins, solution, verbose)) {
+//        info(0, verbose, "invalid solution");
+//      }
 
       // post processing
       print_stats(verbose, ins, solution, comp_time_ms);

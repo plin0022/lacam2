@@ -67,5 +67,34 @@ uint DistTable::get(uint i, uint v_id)
   return V_size;
 }
 
+uint FlexTable::get(uint i, Vertex* v, DistTable& distTable)
+{
+  if (table[i][v->id] < std::numeric_limits<unsigned int>::max()) return table[i][v->id];
+
+  const uint curr_dis = distTable.get(i, v);
+  int award_points = 2;
+  volatile uint final_points = 0;
+  std::queue<Vertex*> lower_cost_neigh;
+
+  for (auto a_node : v->neighbor)
+  {
+    if (distTable.get(i, a_node) < curr_dis) lower_cost_neigh.push(a_node);
+  }
+
+  while (!lower_cost_neigh.empty())
+  {
+    auto curr_neigh_node = lower_cost_neigh.front();
+    lower_cost_neigh.pop();
+    final_points = final_points + award_points +
+                   get(i, curr_neigh_node, distTable);
+  }
+
+  table[i][v->id] = final_points;
+
+  return final_points;
+}
+
 uint DistTable::get(uint i, Vertex* v) { return get(i, v->id); }
+
+
 

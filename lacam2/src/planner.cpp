@@ -329,11 +329,22 @@ bool Planner::funcPIBT(Agent* ai)
   }
   C_next[i][K] = ai->v_now;
 
+
+//  // sort
+//  std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
+//            [&](Vertex* const v, Vertex* const u) {
+//              return D.get(i, v) + tie_breakers[v->id] <
+//                     D.get(i, u) + tie_breakers[u->id];
+//            });
+
   // sort
   std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
             [&](Vertex* const v, Vertex* const u) {
-              return D.get(i, v) + tie_breakers[v->id] <
-                     D.get(i, u) + tie_breakers[u->id];
+              if (D.get(i, v) != D.get(i, u))
+                return D.get(i, v) < D.get(i, u);
+              if (FLEX.get(i, v, D) != FLEX.get(i, u, D))
+                return FLEX.get(i, v, D) > FLEX.get(i, u, D);
+              return tie_breakers[v->id] < tie_breakers[u->id];
             });
 
   Agent* swap_agent = swap_possible_and_required(ai);
