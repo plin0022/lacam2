@@ -71,20 +71,59 @@ int main(int argc, char* argv[])
   // scenarios
   std::string scen_name;
 //  std::string base_path = "assets/scen-random_random-32-32-20/random-32-32-20-random-";
-//  std::string base_path = "assets/scen-random_warehouse-10-20-10-2-1/warehouse-10-20-10-2-1-random-";
 //  std::string base_path = "assets/scen-random_random-64-64-20/random-64-64-20-random-";
 //  std::string base_path = "assets/scen-random_maze-128-128-1/maze-128-128-1-random-";
 //  std::string base_path = "assets/scen-random_den312d/den312d-random-";
-  std::string base_path = "assets/scen-random_empty-48-48/empty-48-48-random-";
+//  std::string base_path = "assets/scen-random_empty-48-48/empty-48-48-random-";
+//  std::string base_path = "assets/scen-random_empty-32-32/empty-32-32-random-";
+//  std::string base_path = "assets/scen-random_Berlin_1_256/Berlin_1_256-random-";
+//  std::string base_path = "assets/scen-random_den520d/den520d-random-";
+//  std::string base_path = "assets/scen-random_ht_chantry/ht_chantry-random-";
+//  std::string base_path = "assets/scen-random_ht_mansion_n/ht_mansion_n-random-";
+//  std::string base_path = "assets/scen-random_lak303d/lak303d-random-";
+//  std::string base_path = "assets/scen-random_lt_gallowstemplar_n/lt_gallowstemplar_n-random-";
+//  std::string base_path = "assets/scen-random_maze-32-32-2/maze-32-32-2-random-";
+//  std::string base_path = "assets/scen-random_maze-32-32-4/maze-32-32-4-random-";
+//  std::string base_path = "assets/scen-random_ost003d/ost003d-random-";
+//  std::string base_path = "assets/scen-random_random-32-32-10/random-32-32-10-random-";
+//  std::string base_path = "assets/scen-random_random-64-64-10/random-64-64-10-random-";
+//  std::string base_path = "assets/scen-random_room-64-64-16/room-64-64-16-random-";
+//  std::string base_path = "assets/scen-random_room-64-64-8/room-64-64-8-random-";
+//  std::string base_path = "assets/scen-random_warehouse-10-20-10-2-1/warehouse-10-20-10-2-1-random-";
+//  std::string base_path = "assets/scen-random_warehouse-10-20-10-2-2/warehouse-10-20-10-2-2-random-";
+//  std::string base_path = "assets/scen-random_warehouse-20-40-10-2-1/warehouse-20-40-10-2-1-random-";
+  std::string base_path = "assets/scen-random_warehouse-20-40-10-2-2/warehouse-20-40-10-2-2-random-";
 
 
   // map
 //  std::string map_name = "assets/random-32-32-20.map";
-//  std::string map_name = "assets/warehouse-10-20-10-2-1.map";
 //  std::string map_name = "assets/random-64-64-20.map";
 //  std::string map_name = "assets/maze-128-128-1.map";
 //  std::string map_name = "assets/den312d.map";
-  std::string map_name = "assets/empty-48-48.map";
+//  std::string map_name = "assets/empty-48-48.map";
+//  std::string map_name = "assets/empty-16-16.map";
+//  std::string map_name = "assets/Berlin_1_256.map";
+//  std::string map_name = "assets/den520d.map";
+//  std::string map_name = "assets/ht_chantry.map";
+//  std::string map_name = "assets/ht_mansion_n.map";
+//  std::string map_name = "assets/lak303d.map";
+//  std::string map_name = "assets/lt_gallowstemplar_n.map";
+//  std::string map_name = "assets/maze-32-32-2.map";
+//  std::string map_name = "assets/maze-32-32-4.map";
+//  std::string map_name = "assets/ost003d.map";
+//  std::string map_name = "assets/random-32-32-10.map";
+//  std::string map_name = "assets/random-64-64-10.map";
+//  std::string map_name = "assets/room-32-32-4.map";
+//  std::string map_name = "assets/room-64-64-16.map";
+//  std::string map_name = "assets/room-64-64-8.map";
+//  std::string map_name = "assets/warehouse-10-20-10-2-1.map";
+//  std::string map_name = "assets/warehouse-10-20-10-2-2.map";
+//  std::string map_name = "assets/warehouse-20-40-10-2-1.map";
+  std::string map_name = "assets/warehouse-20-40-10-2-2.map";
+
+
+
+
 
 
 
@@ -94,13 +133,15 @@ int main(int argc, char* argv[])
 
 
   // objectives
+  volatile float temp_sol = 0;
   volatile float temp_soc = 0;
-  volatile float temp_soc_lb = 0;
+  volatile float temp_soc_lb = 0;  // soc and sol share the same lower bound
   volatile float temp_makespan = 0;
   volatile float temp_makespan_lb = 0;
   volatile float temp_time = 0;
 
 
+  volatile float sum_sol_over_lb = 0;
   volatile float sum_soc_over_lb = 0;
   volatile float sum_makespan_over_lb = 0;
   volatile float sum_time = 0;
@@ -113,6 +154,7 @@ int main(int argc, char* argv[])
   for (int num_of_agents = 10; num_of_agents <= max_num_agents; num_of_agents = num_of_agents + 10)
   {
     // initialize parameters
+    sum_sol_over_lb = 0;
     sum_soc_over_lb = 0;
     sum_makespan_over_lb = 0;
     sum_time = 0;
@@ -151,6 +193,7 @@ int main(int argc, char* argv[])
 
 
       auto dist_table = DistTable(ins);
+      temp_sol = (float)get_sum_of_loss(solution);
       temp_soc = (float)get_sum_of_costs(solution);
       temp_soc_lb = (float)get_sum_of_costs_lower_bound(ins, dist_table);
       temp_makespan = (float)get_makespan(solution);
@@ -162,6 +205,7 @@ int main(int argc, char* argv[])
       {
         sum_success = sum_success + 1;
 
+        sum_sol_over_lb = sum_sol_over_lb + temp_sol / temp_soc_lb;
         sum_soc_over_lb = sum_soc_over_lb + temp_soc / temp_soc_lb;
         sum_makespan_over_lb = sum_makespan_over_lb + temp_makespan / temp_makespan_lb;
         sum_time = sum_time + temp_time;
@@ -172,6 +216,7 @@ int main(int argc, char* argv[])
     temp_list.push_back(num_of_agents);
     temp_list.push_back(sum_success / max_scen_num);
     temp_list.push_back(sum_time / sum_success);
+    temp_list.push_back(sum_sol_over_lb / sum_success);
     temp_list.push_back(sum_soc_over_lb / sum_success);
     temp_list.push_back(sum_makespan_over_lb / sum_success);
 

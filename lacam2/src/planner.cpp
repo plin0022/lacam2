@@ -337,6 +337,7 @@ bool Planner::funcPIBT(Agent* ai)
 //                     D.get(i, u) + tie_breakers[u->id];
 //            });
 
+
   // sort
   std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
             [&](Vertex* const v, Vertex* const u) {
