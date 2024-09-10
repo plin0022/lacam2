@@ -343,8 +343,8 @@ bool Planner::funcPIBT(Agent* ai)
             [&](Vertex* const v, Vertex* const u) {
               if (D.get(i, v) != D.get(i, u))
                 return D.get(i, v) < D.get(i, u);
-              if (FLEX.get(i, v, D) != FLEX.get(i, u, D))
-                return FLEX.get(i, v, D) > FLEX.get(i, u, D);
+              if (FLEX.get(i, v, D, 0) != FLEX.get(i, u, D, 0))
+                return FLEX.get(i, v, D, 0) > FLEX.get(i, u, D, 0);
               return tie_breakers[v->id] < tie_breakers[u->id];
             });
 

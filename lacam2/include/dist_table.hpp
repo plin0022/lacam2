@@ -27,7 +27,7 @@ struct FlexTable{
   const uint V_size;  // number of vertices
   std::vector<std::vector<uint>> table;  // index: agent-id & vertex-id
 
-  uint get(uint i, Vertex* v, DistTable& distTable);             // agent, vertex
+  uint get(uint i, Vertex* v, DistTable& distTable, int step);             // agent, vertex
 
   FlexTable(const Instance* ins);
 

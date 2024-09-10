@@ -67,9 +67,11 @@ uint DistTable::get(uint i, uint v_id)
   return V_size;
 }
 
-uint FlexTable::get(uint i, Vertex* v, DistTable& distTable)
+uint FlexTable::get(uint i, Vertex* v, DistTable& distTable, int step)
 {
   if (table[i][v->id] < std::numeric_limits<unsigned int>::max()) return table[i][v->id];
+
+  if (step >= 5) return 0;
 
   const uint curr_dis = distTable.get(i, v);
   int award_points = 2;
@@ -79,7 +81,7 @@ uint FlexTable::get(uint i, Vertex* v, DistTable& distTable)
   {
     if (distTable.get(i, a_node) < curr_dis)
       final_points = final_points + award_points +
-                     get(i, a_node, distTable);
+                     get(i, a_node, distTable, step + 1);
   }
 
   table[i][v->id] = final_points;
