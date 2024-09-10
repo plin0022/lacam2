@@ -73,7 +73,7 @@ uint FlexTable::get(uint i, Vertex* v, DistTable& distTable)
 
   const uint curr_dis = distTable.get(i, v);
   int award_points = 2;
-  volatile uint final_points = 0;
+  uint final_points = 0;
   std::queue<Vertex*> lower_cost_neigh;
 
   for (auto a_node : v->neighbor)
