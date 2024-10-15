@@ -71,7 +71,9 @@ uint FlexTable::get(uint i, Vertex* v, DistTable& distTable, int step)
 {
   if (table[i][v->id] < std::numeric_limits<unsigned int>::max()) return table[i][v->id];
 
-  if (step >= 5) return 0;
+//  if (step >= 1) return 0;
+//  if (step >= 5) return 0;
+//  if (step >= 10) return 0;
 
   const uint curr_dis = distTable.get(i, v);
   int award_points = 2;
