@@ -112,4 +112,5 @@ struct Planner {
               << "  node_cnt:" << std::setw(8) << HNode::HNODE_CNT << "\t";
     info(level, verbose, (body)...);
   }
+  bool tempPIBT(Agent* ai);
 };

@@ -330,23 +330,23 @@ bool Planner::funcPIBT(Agent* ai)
   C_next[i][K] = ai->v_now;
 
 
-//  // sort
-//  std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
-//            [&](Vertex* const v, Vertex* const u) {
-//              return D.get(i, v) + tie_breakers[v->id] <
-//                     D.get(i, u) + tie_breakers[u->id];
-//            });
-
-
   // sort
   std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
             [&](Vertex* const v, Vertex* const u) {
-              if (D.get(i, v) != D.get(i, u))
-                return D.get(i, v) < D.get(i, u);
-              if (FLEX.get(i, v, D, 0) != FLEX.get(i, u, D, 0))
-                return FLEX.get(i, v, D, 0) > FLEX.get(i, u, D, 0);
-              return tie_breakers[v->id] < tie_breakers[u->id];
+              return D.get(i, v) + tie_breakers[v->id] <
+                     D.get(i, u) + tie_breakers[u->id];
             });
+
+
+//  // sort
+//  std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
+//            [&](Vertex* const v, Vertex* const u) {
+//              if (D.get(i, v) != D.get(i, u))
+//                return D.get(i, v) < D.get(i, u);
+//              if (FLEX.get(i, v, D, 0) != FLEX.get(i, u, D, 0))
+//                return FLEX.get(i, v, D, 0) > FLEX.get(i, u, D, 0);
+//              return tie_breakers[v->id] < tie_breakers[u->id];
+//            });
 
   Agent* swap_agent = swap_possible_and_required(ai);
   if (swap_agent != nullptr)
@@ -379,6 +379,59 @@ bool Planner::funcPIBT(Agent* ai)
       swap_agent->v_next = ai->v_now;
       occupied_next[swap_agent->v_next->id] = swap_agent;
     }
+    return true;
+  }
+
+  // failed to secure node
+  occupied_next[ai->v_now->id] = ai;
+  ai->v_next = ai->v_now;
+  return false;
+}
+
+bool Planner::tempPIBT(Agent* ai)
+{
+  const auto i = ai->id;
+  const auto K = ai->v_now->neighbor.size();
+
+  // get candidates for next locations
+  for (auto k = 0; k < K; ++k) {
+    auto u = ai->v_now->neighbor[k];
+    C_next[i][k] = u;
+    if (MT != nullptr)
+      tie_breakers[u->id] = get_random_float(MT);  // set tie-breaker
+  }
+  C_next[i][K] = ai->v_now;
+
+
+  // sort
+  std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
+            [&](Vertex* const v, Vertex* const u) {
+              return D.get(i, v) + tie_breakers[v->id] <
+                     D.get(i, u) + tie_breakers[u->id];
+            });
+
+
+  // main operation
+  for (auto k = 0; k < K + 1; ++k) {
+    auto u = C_next[i][k];
+
+    // avoid vertex conflicts
+    if (occupied_next[u->id] != nullptr) continue;
+
+    auto& ak = occupied_now[u->id];
+
+    // avoid swap conflicts
+    if (ak != nullptr && ak->v_next == ai->v_now) continue;
+
+    // reserve next location
+    occupied_next[u->id] = ai;
+    ai->v_next = u;
+
+    // priority inheritance
+    if (ak != nullptr && ak != ai && ak->v_next == nullptr && !tempPIBT(ak))
+      continue;
+
+    // success to plan next one step
     return true;
   }
 

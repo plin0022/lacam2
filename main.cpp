@@ -86,11 +86,11 @@ int main(int argc, char* argv[])
 //  std::string base_path = "assets/scen-random_maze-32-32-2/maze-32-32-2-random-";
 //  std::string base_path = "assets/scen-random_maze-32-32-4/maze-32-32-4-random-";
 //  std::string base_path = "assets/scen-random_ost003d/ost003d-random-";
-  std::string base_path = "assets/scen-random_orz900d/orz900d-random-";
+//  std::string base_path = "assets/scen-random_orz900d/orz900d-random-";
 //  std::string base_path = "assets/scen-even_orz900d/orz900d-even-";
 
 //  std::string base_path = "assets/scen-random_random-32-32-10/random-32-32-10-random-";
-//  std::string base_path = "assets/scen-random_random-64-64-10/random-64-64-10-random-";
+  std::string base_path = "assets/scen-random_random-64-64-10/random-64-64-10-random-";
 //  std::string base_path = "assets/scen-random_room-64-64-16/room-64-64-16-random-";
 //  std::string base_path = "assets/scen-random_room-64-64-8/room-64-64-8-random-";
 //  std::string base_path = "assets/scen-random_warehouse-10-20-10-2-1/warehouse-10-20-10-2-1-random-";
@@ -115,10 +115,10 @@ int main(int argc, char* argv[])
 //  std::string map_name = "assets/maze-128-128-10.map";
 //  std::string map_name = "assets/maze-32-32-2.map";
 //  std::string map_name = "assets/maze-32-32-4.map";
-  std::string map_name = "assets/orz900d.map";
+//  std::string map_name = "assets/orz900d.map";
 //  std::string map_name = "assets/ost003d.map";
 //  std::string map_name = "assets/random-32-32-10.map";
-//  std::string map_name = "assets/random-64-64-10.map";
+  std::string map_name = "assets/random-64-64-10.map";
 //  std::string map_name = "assets/room-32-32-4.map";
 //  std::string map_name = "assets/room-64-64-16.map";
 //  std::string map_name = "assets/room-64-64-8.map";
@@ -130,7 +130,6 @@ int main(int argc, char* argv[])
 
 
 
-// version_1
 
 
 
