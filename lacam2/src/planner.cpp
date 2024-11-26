@@ -388,7 +388,7 @@ bool Planner::funcPIBT(Agent* ai)
   return false;
 }
 
-bool Planner::tempPIBT(Agent* ai)
+std::pair<bool, int> Planner::tempPIBT(Agent* ai, uint comp)
 {
   const auto i = ai->id;
   const auto K = ai->v_now->neighbor.size();
@@ -410,6 +410,9 @@ bool Planner::tempPIBT(Agent* ai)
                      D.get(i, u) + tie_breakers[u->id];
             });
 
+  uint min_costs = D.get(i, C_next[i][0]);
+  uint curr_comp = 0;
+
 
   // main operation
   for (auto k = 0; k < K + 1; ++k) {
@@ -426,14 +429,58 @@ bool Planner::tempPIBT(Agent* ai)
     // reserve next location
     occupied_next[u->id] = ai;
     ai->v_next = u;
+    curr_comp = comp + D.get(i, u) - min_costs;
 
     // priority inheritance
-    if (ak != nullptr && ak != ai && ak->v_next == nullptr && !tempPIBT(ak))
-      continue;
+    if (ak != nullptr && ak != ai && ak->v_next == nullptr)
+    {
+      std::pair<bool, int> result = tempPIBT(ak, curr_comp);
+      if (!result.first) {
+        occupied_next[u->id] = nullptr;
+        ai->v_next = nullptr;
+        continue;
+      }
+      else
+        curr_comp = result.second;
+    }
 
-    // success to plan next one step
-    return true;
+    // reset the changes from simulation and success to plan next one step
+    occupied_next[u->id] = nullptr;
+    ai->v_next = nullptr;
+    return {true, curr_comp};
   }
+
+  // failed to secure node
+  return {false, D.get(i, ai->v_now) - min_costs};
+}
+
+// Run simulation of evaluating the compromises of a tile to an agent
+std::pair<bool, int> Planner::get_compromises(Agent* ai, Vertex* v, uint min_costs)
+{
+  const auto i = ai->id;
+
+  uint comp = D.get(i, v) - min_costs;
+
+  // avoid vertex conflicts
+  if (occupied_next[v->id] != nullptr) return {false, 4294967200};
+
+  auto& ak = occupied_now[v->id];
+
+  // avoid swap conflicts
+  if (ak != nullptr && ak->v_next == ai->v_now) return {false, 4294967200};
+
+  // reserve next location
+  occupied_next[v->id] = ai;
+  ai->v_next = v;
+
+  // priority inheritance
+  if (ak != nullptr && ak != ai && ak->v_next == nullptr && !get_compromises().first)
+
+    continue;
+
+  // success to plan next one step
+
+  return true;
 
   // failed to secure node
   occupied_next[ai->v_now->id] = ai;

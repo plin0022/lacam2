@@ -74,6 +74,7 @@ struct Planner {
   uint loop_cnt;      // auxiliary
 
   // used in PIBT
+  std::vector<std::array<int, 5> > Cost_next;   // push away costs
   std::vector<std::array<Vertex*, 5> > C_next;  // next locations, used in PIBT
   std::vector<float> tie_breakers;              // random values, used in PIBT
   Agents A;
@@ -112,5 +113,6 @@ struct Planner {
               << "  node_cnt:" << std::setw(8) << HNode::HNODE_CNT << "\t";
     info(level, verbose, (body)...);
   }
-  bool tempPIBT(Agent* ai);
+  std::pair<bool, int> tempPIBT(Agent* ai, uint comp);
+  std::pair<bool, int> get_compromises(Agent* ai, Vertex* v, uint comp);
 };
