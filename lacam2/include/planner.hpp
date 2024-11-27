@@ -113,6 +113,6 @@ struct Planner {
               << "  node_cnt:" << std::setw(8) << HNode::HNODE_CNT << "\t";
     info(level, verbose, (body)...);
   }
-  std::pair<bool, int> tempPIBT(Agent* ai, uint comp);
-  std::pair<bool, int> get_compromises(Agent* ai, Vertex* v, uint comp);
+  std::pair<bool, uint> tempPIBT(Agent* ai, uint comp, Agents temp_occupied_next);
+  uint get_compromises(Agent* ai, Vertex* v);
 };

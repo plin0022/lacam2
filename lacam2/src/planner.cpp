@@ -330,11 +330,20 @@ bool Planner::funcPIBT(Agent* ai)
   C_next[i][K] = ai->v_now;
 
 
+//  // sort
+//  std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
+//            [&](Vertex* const v, Vertex* const u) {
+//              return D.get(i, v) + tie_breakers[v->id] <
+//                     D.get(i, u) + tie_breakers[u->id];
+//            });
+
+
+
   // sort
   std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
             [&](Vertex* const v, Vertex* const u) {
-              return D.get(i, v) + tie_breakers[v->id] <
-                     D.get(i, u) + tie_breakers[u->id];
+              return get_compromises(ai, v) <
+                     get_compromises(ai, u);
             });
 
 
@@ -351,6 +360,17 @@ bool Planner::funcPIBT(Agent* ai)
   Agent* swap_agent = swap_possible_and_required(ai);
   if (swap_agent != nullptr)
     std::reverse(C_next[i].begin(), C_next[i].begin() + K + 1);
+
+//  for (auto k = 0; k < K + 1; ++k) {
+//    auto u = C_next[i][k];
+//
+//    volatile uint value = get_compromises(ai, u);
+//
+//    if (value == 10)
+//    {
+//      volatile uint test_value = 10000;
+//    }
+//  }
 
   // main operation
   for (auto k = 0; k < K + 1; ++k) {
@@ -388,7 +408,62 @@ bool Planner::funcPIBT(Agent* ai)
   return false;
 }
 
-std::pair<bool, int> Planner::tempPIBT(Agent* ai, uint comp)
+
+// Run simulation of evaluating the compromises of a tile to an agent
+uint Planner::get_compromises(Agent* ai, Vertex* v)
+{
+  const auto i = ai->id;
+  const auto K = ai->v_now->neighbor.size();
+  auto temp_occupied_next = occupied_next;
+
+  // get candidates for next locations
+  for (auto k = 0; k < K; ++k) {
+    auto u = ai->v_now->neighbor[k];
+    C_next[i][k] = u;
+    if (MT != nullptr)
+      tie_breakers[u->id] = get_random_float(MT);  // set tie-breaker
+  }
+  C_next[i][K] = ai->v_now;
+
+  // sort
+  std::sort(C_next[i].begin(), C_next[i].begin() + K + 1,
+            [&](Vertex* const v, Vertex* const u) {
+              return D.get(i, v) + tie_breakers[v->id] <
+                     D.get(i, u) + tie_breakers[u->id];
+            });
+
+
+  uint curr_comp = D.get(i, v) - D.get(i, C_next[i][0]);
+
+  auto& ak = temp_occupied_next[v->id];
+
+  // reserve next location
+  temp_occupied_next[v->id] = ai;
+  ai->v_next = v;
+
+  // priority inheritance
+  if (ak != nullptr && ak != ai && ak->v_next == nullptr)
+  {
+    std::pair<bool, uint> result = tempPIBT(ak, curr_comp, temp_occupied_next);
+    if (!result.first)
+    {
+      ai->v_next = nullptr;
+      return 100;
+    }
+    else
+    {
+      ai->v_next = nullptr;
+      return result.second;
+    }
+  }
+
+
+  ai->v_next = nullptr;
+
+  return curr_comp;
+}
+
+std::pair<bool, uint> Planner::tempPIBT(Agent* ai, uint comp, Agents temp_occupied_next)
 {
   const auto i = ai->id;
   const auto K = ai->v_now->neighbor.size();
@@ -419,24 +494,24 @@ std::pair<bool, int> Planner::tempPIBT(Agent* ai, uint comp)
     auto u = C_next[i][k];
 
     // avoid vertex conflicts
-    if (occupied_next[u->id] != nullptr) continue;
+    if (temp_occupied_next[u->id] != nullptr) continue;
 
-    auto& ak = occupied_now[u->id];
+    auto& ak = temp_occupied_next[u->id];
 
     // avoid swap conflicts
     if (ak != nullptr && ak->v_next == ai->v_now) continue;
 
     // reserve next location
-    occupied_next[u->id] = ai;
+    temp_occupied_next[u->id] = ai;
     ai->v_next = u;
     curr_comp = comp + D.get(i, u) - min_costs;
 
     // priority inheritance
     if (ak != nullptr && ak != ai && ak->v_next == nullptr)
     {
-      std::pair<bool, int> result = tempPIBT(ak, curr_comp);
+      std::pair<bool, uint> result = tempPIBT(ak, curr_comp, temp_occupied_next);
       if (!result.first) {
-        occupied_next[u->id] = nullptr;
+        temp_occupied_next[u->id] = nullptr;
         ai->v_next = nullptr;
         continue;
       }
@@ -445,7 +520,7 @@ std::pair<bool, int> Planner::tempPIBT(Agent* ai, uint comp)
     }
 
     // reset the changes from simulation and success to plan next one step
-    occupied_next[u->id] = nullptr;
+    temp_occupied_next[u->id] = nullptr;
     ai->v_next = nullptr;
     return {true, curr_comp};
   }
@@ -454,39 +529,7 @@ std::pair<bool, int> Planner::tempPIBT(Agent* ai, uint comp)
   return {false, D.get(i, ai->v_now) - min_costs};
 }
 
-// Run simulation of evaluating the compromises of a tile to an agent
-std::pair<bool, int> Planner::get_compromises(Agent* ai, Vertex* v, uint min_costs)
-{
-  const auto i = ai->id;
 
-  uint comp = D.get(i, v) - min_costs;
-
-  // avoid vertex conflicts
-  if (occupied_next[v->id] != nullptr) return {false, 4294967200};
-
-  auto& ak = occupied_now[v->id];
-
-  // avoid swap conflicts
-  if (ak != nullptr && ak->v_next == ai->v_now) return {false, 4294967200};
-
-  // reserve next location
-  occupied_next[v->id] = ai;
-  ai->v_next = v;
-
-  // priority inheritance
-  if (ak != nullptr && ak != ai && ak->v_next == nullptr && !get_compromises().first)
-
-    continue;
-
-  // success to plan next one step
-
-  return true;
-
-  // failed to secure node
-  occupied_next[ai->v_now->id] = ai;
-  ai->v_next = ai->v_now;
-  return false;
-}
 
 Agent* Planner::swap_possible_and_required(Agent* ai)
 {
